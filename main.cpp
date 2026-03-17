@@ -3,12 +3,18 @@
 #include <iostream>
 #include <cstdlib>
 
-float vertices[] = {
+float squareVertices[] = {
      0.5f,  0.5f, 0.0f,  // top right
      0.5f, -0.5f, 0.0f,  // bottom right
     -0.5f, -0.5f, 0.0f,  // bottom left
     -0.5f,  0.5f, 0.0f   // top left 
 }; 
+
+float triVertices[] = {
+    0.0f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 
+    -0.5f,-0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+    0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f
+};
 
 unsigned int indices[] = {  // note that we start from 0!
     0, 1, 3,   // first triangle
@@ -17,20 +23,23 @@ unsigned int indices[] = {  // note that we start from 0!
 
 const char *vertexShaderSource = "#version 330 core\n"
     "layout (location = 0) in vec3 aPos;\n"
+    "layout (location = 1) in vec3 aColor;\n"
+    "out vec3 uniColor;\n"
     //"out vec4 vertexColor;\n" // vertex shader to fragment shader
     "void main()\n"
     "{\n"
     "   gl_Position = vec4(aPos,1.0);\n"
+    "   uniColor = aColor;\n"
     //"   vertexColor = vec4(0.5, 0.0, 0.0, 1.0);\n" //changes the colour
     "}\0";
 
 const char* fragmentShaderSource = "#version 330 core\n"
     "out vec4 FragColor;\n"
-    //"in vec4 vertexColor;\n"
-    "uniform vec4 uniColor;\n"
+    "in vec3 uniColor;\n"
+    //"uniform vec4 uniColor;\n"
     "void main()\n"
     "{\n"
-    "FragColor = uniColor;\n"
+    "FragColor = vec4(uniColor, 1.0);\n"
     "} \n";
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
@@ -62,8 +71,8 @@ int main() {
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);  
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(triVertices), triVertices, GL_STATIC_DRAW);
 
     // Vertex Shader Code
     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -90,8 +99,12 @@ int main() {
     glDeleteShader(fragmentShader);  
 
     // how OpenGL should interpret vertex data
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0); 
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    // colour attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3* sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     while (!glfwWindowShouldClose(window)) {
         
@@ -107,8 +120,8 @@ int main() {
     
         
         glBindVertexArray(VAO);
-        // glDrawArrays(GL_TRIANGLES, 0, 3);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
         glfwSwapBuffers(window);
         glfwPollEvents();

@@ -72,6 +72,7 @@ int main() {
     // transform = glm::rotate(transform, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
     // transform = glm::scale(transform, glm::vec3(0.5, 0.5, 0.5));
 
+    shader.use();
     
     while (!glfwWindowShouldClose(window)) {
         // render
@@ -80,17 +81,29 @@ int main() {
         glm::mat4 trans = glm::mat4(1.0f);
         trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
         trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+
         
-        shader.use();
+        
         unsigned int transformLoc = glGetUniformLocation(shader.ID, "transform");
         glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        // second triangle
+        trans = glm::mat4(1.0f); // reset it to identity matrix
+        trans = glm::translate(trans, glm::vec3(-0.5f, 0.5f, 0.0f));
+        float scaleAmount = static_cast<float>(sin(glfwGetTime()));
+        trans = glm::scale(trans, glm::vec3(scaleAmount, scaleAmount, scaleAmount));
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, &trans[0][0]);
+
+
         // float time = glfwGetTime();
         // float greenValue = (sin(time) / 2.0f) + 0.5f;
         // int vertexColorLocation = glGetUniformLocation(shaderProgram, "uniColor");
         // glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 
         
-        glBindVertexArray(VAO);
+        
         glDrawArrays(GL_TRIANGLES, 0, 3);
         // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);

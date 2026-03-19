@@ -7,6 +7,16 @@
 #include <cstdlib>
 #include "shader.h"
 
+
+glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f,  3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
+
+float deltaTime = 0.0f;	// Time between current frame and last frame
+float lastFrame = 0.0f; // Time of last frame
+
+
+
 float squareVertices[] = {
     -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.1f,
      0.5f, -0.5f, -0.5f,  1.0f, 0.0f, 0.0f,
@@ -59,6 +69,23 @@ float triVertices[] = {
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
+}
+
+void process_input(GLFWwindow* window) {
+    const float speed = 2.5f * deltaTime;
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+        cameraPos +=  speed * cameraFront;
+    } 
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        cameraPos -= speed * cameraFront;
+    }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * speed;
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * speed;
+    }
+
 }
 
 int main() {
@@ -122,24 +149,33 @@ int main() {
     glEnable(GL_DEPTH_TEST); 
     shader.use();
 
-    glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);  
-    glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-    glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
+    // glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);  
+    // glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+    // glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
 
-    glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f); 
-    glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
+    // glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f); 
+    // glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
 
-    glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
+    // glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
     glm::mat4 view;
-    view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f), 
-  		   glm::vec3(0.0f, 0.0f, 0.0f), 
-  		   glm::vec3(0.0f, 1.0f, 0.0f));
+
+
+    // view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f), 
+  	// 	   glm::vec3(0.0f, 0.0f, 0.0f), 
+  	// 	   glm::vec3(0.0f, 1.0f, 0.0f));
+
+    
 
 
     glm::mat4 projection = glm::perspective(glm::radians(35.0f), (float)640 / (float)480, 0.1f, 100.0f);
     shader.setMat4("projection", projection);
     while (!glfwWindowShouldClose(window)) {
         // render
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame; 
+        view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+        process_input(window);
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         shader.use();
@@ -148,14 +184,11 @@ int main() {
         trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
         trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
         
-        float camX = sin(glfwGetTime()) * radius;
-        float camZ = cos(glfwGetTime()) * radius;
-        glm::mat4 view;
-        view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));  
+        // float camX = sin(glfwGetTime()) * radius;
+        // float camZ = cos(glfwGetTime()) * radius;
+        // glm::mat4 view;
+        // view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));  
 
-        // glm::mat4 view          = glm::mat4(1.0f);
-        // view  = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-        // retrieve the matrix uniform locations
         unsigned int modelLoc = glGetUniformLocation(shader.ID, "model");
         unsigned int viewLoc  = glGetUniformLocation(shader.ID, "view");
         shader.setMat4("view", view);

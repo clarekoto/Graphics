@@ -47,6 +47,9 @@ public:
         {
             std::cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: " << e.what() << std::endl;
         }
+
+         std::cout << "Vertex code length: " << vertexCode.size() << std::endl;
+        std::cout << "Fragment code length: " << fragmentCode.size() << std::endl;
         const char* vShaderCode = vertexCode.c_str();
         const char * fShaderCode = fragmentCode.c_str();
         // 2. compile shaders

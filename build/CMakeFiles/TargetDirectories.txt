@@ -1,0 +1,3 @@
+/Users/clarejohnston/Documents/Uni/COSC3000/project/build/CMakeFiles/main.dir
+/Users/clarejohnston/Documents/Uni/COSC3000/project/build/CMakeFiles/edit_cache.dir
+/Users/clarejohnston/Documents/Uni/COSC3000/project/build/CMakeFiles/rebuild_cache.dir

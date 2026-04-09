@@ -6,6 +6,10 @@
 #include <iostream>
 #include <cstdlib>
 #include "shader.h"
+#include "model.h"
+// #define STB_IMAGE_IMPLEMENTATION
+// #include <stb_image.h>
+
 
 
 glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f,  3.0f);
@@ -14,7 +18,13 @@ glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
 
 float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
-
+float yaw = -90.0f;
+float pitch = 0.0f;
+bool firstMouse = true;
+float lastX = 400, lastY = 300;
+float fov   =  45.0f;
+int SCR_WIDTH = 640;
+int SCR_HEIGHT = 480;
 
 
 float squareVertices[] = {
@@ -71,6 +81,15 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
+// Mesh::Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures) {
+//     this->vertices = vertices;
+//     this->indices = indices;
+//     this->textures = textures;
+
+//     setupMesh();
+// }
+
+
 void process_input(GLFWwindow* window) {
     const float speed = 2.5f * deltaTime;
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
@@ -87,6 +106,48 @@ void process_input(GLFWwindow* window) {
     }
 
 }
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    fov -= (float)yoffset;
+    if (fov < 1.0f)
+        fov = 1.0f;
+    if (fov > 45.0f)
+        fov = 45.0f;
+}
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    if (firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+  
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; 
+    lastX = xpos;
+    lastY = ypos;
+
+    float sensitivity = 0.1f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    yaw   += xoffset;
+    pitch += yoffset;
+
+    if(pitch > 89.0f)
+        pitch = 89.0f;
+    if(pitch < -89.0f)
+        pitch = -89.0f;
+
+    glm::vec3 direction;
+    direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    direction.y = sin(glm::radians(pitch));
+    direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    cameraFront = glm::normalize(direction);
+}  
 
 int main() {
     glfwInit();
@@ -144,74 +205,64 @@ int main() {
 
 
     const float radius = 10.0f;
+    // stbi_set_flip_vertically_on_load(true);
+    Model model("3d_models/cow.obj");
+    std::cout << "Meshes loaded: " << model.meshes.size() << std::endl;
 
-
+    if (model.meshes.size() > 0) {
+    float minX=1e9, maxX=-1e9, minY=1e9, maxY=-1e9, minZ=1e9, maxZ=-1e9;
+    for (auto& v : model.meshes[0].vertices) {
+        minX = std::min(minX, v.Position.x);
+        maxX = std::max(maxX, v.Position.x);
+        minY = std::min(minY, v.Position.y);
+        maxY = std::max(maxY, v.Position.y);
+        minZ = std::min(minZ, v.Position.z);
+        maxZ = std::max(maxZ, v.Position.z);
+    }
+    std::cout << "X: " << minX << " to " << maxX << std::endl;
+    std::cout << "Y: " << minY << " to " << maxY << std::endl;
+    std::cout << "Z: " << minZ << " to " << maxZ << std::endl;
+    }
     glEnable(GL_DEPTH_TEST); 
     shader.use();
-
-    // glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);  
-    // glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-    // glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
-
-    // glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f); 
-    // glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
-
-    // glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
     glm::mat4 view;
-
-
-    // view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f), 
-  	// 	   glm::vec3(0.0f, 0.0f, 0.0f), 
-  	// 	   glm::vec3(0.0f, 1.0f, 0.0f));
-
-    
+    glfwSetCursorPosCallback(window, mouse_callback); 
+    glfwSetScrollCallback(window, scroll_callback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); 
 
 
     glm::mat4 projection = glm::perspective(glm::radians(35.0f), (float)640 / (float)480, 0.1f, 100.0f);
     shader.setMat4("projection", projection);
     while (!glfwWindowShouldClose(window)) {
-        // render
-        float currentFrame = glfwGetTime();
+         // per-frame time logic
+        // --------------------
+        float currentFrame = static_cast<float>(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame; 
-        view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+        lastFrame = currentFrame;
+
+        // input
+        // -----
         process_input(window);
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+
+        // render
+        // ------
+        glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         shader.use();
 
-        glm::mat4 trans = glm::mat4(1.0f);
-        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-        trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-        
-        // float camX = sin(glfwGetTime()) * radius;
-        // float camZ = cos(glfwGetTime()) * radius;
-        // glm::mat4 view;
-        // view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));  
-
-        unsigned int modelLoc = glGetUniformLocation(shader.ID, "model");
-        unsigned int viewLoc  = glGetUniformLocation(shader.ID, "view");
+        glm::mat4 projection = glm::perspective(glm::radians(fov), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
+        glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+        glm::mat4 modelMat = glm::mat4(1.0f);
+        modelMat = glm::scale(modelMat, glm::vec3(0.002f));
+        shader.setMat4("projection", projection);
         shader.setMat4("view", view);
-        
-        glBindVertexArray(VAO);
-        for(unsigned int i = 0; i < 10; i++)
-        {
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, cubePositions[i]);
-            float angle = 20.0f * (i+1); 
-            model = glm::rotate(model, (float)glfwGetTime() * glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-            shader.setMat4("model", model);
+        shader.setMat4("model", modelMat);
 
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
+        model.Draw(shader);
 
-        // second triangle
-        trans = glm::mat4(1.0f); // reset it to identity matrix
-        trans = glm::translate(trans, glm::vec3(-0.5f, 0.5f, 0.0f));
-        float scaleAmount = static_cast<float>(sin(glfwGetTime()));
-        trans = glm::scale(trans, glm::vec3(scaleAmount, scaleAmount, scaleAmount));
-        glBindVertexArray(0);
-        
+        // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
+        // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
         glfwPollEvents();
     }

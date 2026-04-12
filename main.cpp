@@ -25,43 +25,44 @@ float lastX = 400, lastY = 300;
 float fov   =  45.0f;
 int SCR_WIDTH = 640;
 int SCR_HEIGHT = 480;
+int colourMode = 0;
 
 
 float squareVertices[] = {
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.1f,
-     0.5f, -0.5f, -0.5f,  1.0f, 0.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 1.0f,
+    // -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.1f,
+    //  0.5f, -0.5f, -0.5f,  1.0f, 0.0f, 0.0f,
+    //  0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f,
+    //  0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f,
+    // -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 1.0f,
+    // -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 1.0f,
 
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 0.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,
+    // -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,
+    //  0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 1.0f,
+    //  0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 0.0f,
+    //  0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 0.0f,
+    // -0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 0.0f,
+    // -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,
 
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 1.0f,
-    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,0.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,0.0f,
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,1.0f,
+    // -0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 1.0f,
+    // -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,0.0f,
+    // -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,1.0f,
+    // -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
+    // -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,0.0f,
+    // -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,1.0f,
 
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,0.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,1.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,1.0f,
+    //  0.5f,  0.5f,  0.5f,  1.0f, 0.0f,0.0f,
+    //  0.5f,  0.5f, -0.5f,  1.0f, 1.0f,1.0f,
+    //  0.5f, -0.5f, -0.5f,  0.0f, 1.0f,0.0f,
+    //  0.5f, -0.5f, -0.5f,  0.0f, 1.0f,1.0f,
+    //  0.5f, -0.5f,  0.5f,  0.0f, 0.0f,0.0f,
+    //  0.5f,  0.5f,  0.5f,  1.0f, 0.0f,1.0f,
 
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,0.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,1.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,0.0f,
+    // -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,0.0f,
+    //  0.5f, -0.5f, -0.5f,  1.0f, 1.0f,1.0f,
+    //  0.5f, -0.5f,  0.5f,  1.0f, 0.0f,0.0f,
+    //  0.5f, -0.5f,  0.5f,  1.0f, 0.0f,1.0f,
+    // -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,1.0f,
+    // -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,0.0f,
 
     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,0.0f,
      0.5f,  0.5f, -0.5f,  1.0f, 1.0f,1.0f,
@@ -81,14 +82,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-// Mesh::Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures) {
-//     this->vertices = vertices;
-//     this->indices = indices;
-//     this->textures = textures;
-
-//     setupMesh();
-// }
-
 
 void process_input(GLFWwindow* window) {
     const float speed = 2.5f * deltaTime;
@@ -104,6 +97,12 @@ void process_input(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
         cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * speed;
     }
+    if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS) {
+        colourMode = 1 - colourMode;
+    }
+
+
+
 
 }
 
@@ -206,23 +205,10 @@ int main() {
 
     const float radius = 10.0f;
     // stbi_set_flip_vertically_on_load(true);
-    Model model("3d_models/cow.obj");
+    Model model("3d_models/1.obj");
     std::cout << "Meshes loaded: " << model.meshes.size() << std::endl;
 
-    if (model.meshes.size() > 0) {
-    float minX=1e9, maxX=-1e9, minY=1e9, maxY=-1e9, minZ=1e9, maxZ=-1e9;
-    for (auto& v : model.meshes[0].vertices) {
-        minX = std::min(minX, v.Position.x);
-        maxX = std::max(maxX, v.Position.x);
-        minY = std::min(minY, v.Position.y);
-        maxY = std::max(maxY, v.Position.y);
-        minZ = std::min(minZ, v.Position.z);
-        maxZ = std::max(maxZ, v.Position.z);
-    }
-    std::cout << "X: " << minX << " to " << maxX << std::endl;
-    std::cout << "Y: " << minY << " to " << maxY << std::endl;
-    std::cout << "Z: " << minZ << " to " << maxZ << std::endl;
-    }
+
     glEnable(GL_DEPTH_TEST); 
     shader.use();
     glm::mat4 view;
@@ -250,11 +236,18 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         shader.use();
+        shader.setInt("colourMode", colourMode);
 
         glm::mat4 projection = glm::perspective(glm::radians(fov), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10000.0f);
         glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+
+        float t = (float)glfwGetTime();
+
         glm::mat4 modelMat = glm::mat4(1.0f);
-        modelMat = glm::scale(modelMat, glm::vec3(0.002f));
+        modelMat = glm::scale(modelMat, glm::vec3(0.001f));
+        modelMat = glm::translate(modelMat, glm::vec3(sin(t) * 50.0f, 0.0f, 0.0f));
+        modelMat = glm::rotate(modelMat, t * 0.5f, glm::vec3(0.0f, 1.0f, 0.0f));
+
         shader.setMat4("projection", projection);
         shader.setMat4("view", view);
         shader.setMat4("model", modelMat);

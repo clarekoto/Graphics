@@ -7,48 +7,57 @@
 #include <cstdlib>
 #include "shader.h"
 
+int WND_WIDTH = 1280;
+int WND_HEIGHT = 960;
+
 float squareVertices[] = {
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.1f,
-     0.5f, -0.5f, -0.5f,  1.0f, 0.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 1.0f,
+    // back face - deep blue
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.2f, 0.8f,
+     0.5f, -0.5f, -0.5f,  0.0f, 0.2f, 0.8f,
+     0.5f,  0.5f, -0.5f,  0.0f, 0.2f, 0.8f,
+     0.5f,  0.5f, -0.5f,  0.0f, 0.2f, 0.8f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 0.2f, 0.8f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.2f, 0.8f,
 
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 0.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,
+    // front face - cyan
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.9f, 1.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, 0.9f, 1.0f,
+     0.5f,  0.5f,  0.5f,  0.0f, 0.9f, 1.0f,
+     0.5f,  0.5f,  0.5f,  0.0f, 0.9f, 1.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 0.9f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.9f, 1.0f,
 
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 1.0f,
-    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 1.0f,
+    // left face - purple
+    -0.5f,  0.5f,  0.5f,  0.6f, 0.0f, 1.0f,
+    -0.5f,  0.5f, -0.5f,  0.6f, 0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.6f, 0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.6f, 0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.6f, 0.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,  0.6f, 0.0f, 1.0f,
 
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 1.0f,
+    // right face - violet
+     0.5f,  0.5f,  0.5f,  0.8f, 0.2f, 1.0f,
+     0.5f,  0.5f, -0.5f,  0.8f, 0.2f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.8f, 0.2f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.8f, 0.2f, 1.0f,
+     0.5f, -0.5f,  0.5f,  0.8f, 0.2f, 1.0f,
+     0.5f,  0.5f,  0.5f,  0.8f, 0.2f, 1.0f,
 
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
+    // bottom face - dark blue
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.1f, 0.5f,
+     0.5f, -0.5f, -0.5f,  0.0f, 0.1f, 0.5f,
+     0.5f, -0.5f,  0.5f,  0.0f, 0.1f, 0.5f,
+     0.5f, -0.5f,  0.5f,  0.0f, 0.1f, 0.5f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.1f, 0.5f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.1f, 0.5f,
 
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 1.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f
+    // top face - bright cyan
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.9f,
+     0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.9f,
+     0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 0.9f,
+     0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 0.9f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 0.9f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.9f
 };
 
 float triVertices[] = {
@@ -67,7 +76,17 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    GLFWwindow* window = glfwCreateWindow(640, 480, "Project1", NULL, NULL);
+    const int NUM_STARS = 400;
+    glm::vec3 starPositions[NUM_STARS];
+    srand(42); // fixed seed so stars don't move on restart
+    for (int i = 0; i < NUM_STARS; i++) {
+        starPositions[i] = glm::vec3(
+            ((rand() % 200) - 100.0f),  // x: -100 to 100
+            ((rand() % 200) - 100.0f),  // y: -100 to 100
+            ((rand() % 200) - 100.0f)   // z: -100 to 100
+        );
+    }
+    GLFWwindow* window = glfwCreateWindow(WND_WIDTH, WND_HEIGHT, "Project1", NULL, NULL);
     if (window == NULL) {
         std::cout << "Failed to create window" << std::endl;
         glfwTerminate();
@@ -104,36 +123,64 @@ int main() {
 
     glEnable(GL_DEPTH_TEST); 
     shader.use();
-    glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)640 / (float)480, 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WND_WIDTH / (float)WND_HEIGHT, 0.1f, 200.0f);
     shader.setMat4("projection", projection);
 
     while (!glfwWindowShouldClose(window)) {
         // render
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         shader.use();
 
-        glm::mat4 trans = glm::mat4(1.0f);
-        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-        trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-        
+       
         glm::mat4 view = glm::mat4(1.0f);
-        view  = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        view  = glm::translate(view, glm::vec3(0.0f, 0.0f, -2.5f));
 
-        // retrieve the matrix uniform locations
-        unsigned int modelLoc = glGetUniformLocation(shader.ID, "model");
-        unsigned int viewLoc  = glGetUniformLocation(shader.ID, "view");
         shader.setMat4("view", view);
+        glBindVertexArray(VAO);
+        shader.setFloat("alpha", 1.0f);
+
+         // draw stars
+        for (int i = 0; i < NUM_STARS; i++) {
+            glm::mat4 starModel = glm::mat4(1.0f);
+            starModel = glm::translate(starModel, starPositions[i]);
+            starModel = glm::scale(starModel, glm::vec3(0.1f)); // tiny
+            shader.setMat4("model", starModel);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
         
+
         glBindVertexArray(VAO);
     
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3( 0.0f,  0.0f,  0.0f));
         float angle = 20.0f; 
-        model = glm::rotate(model, (float)glfwGetTime() * glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+        model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
         shader.setMat4("model", model);
-
+        
+        shader.setFloat("alpha", 1.0f);
+        shader.setMat4("model", model);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        float offset = 0.002f;
+        glm::vec3 offsets[] = {
+            {0, 0, 0},
+            {offset, 0, 0}, {-offset, 0, 0},
+            {0, offset, 0}, {0, -offset, 0},
+            {offset, offset, 0}, {-offset, -offset, 0},
+            {offset, -offset, 0}, {-offset, offset, 0},
+            {offset*2, 0, 0}, {-offset*2, 0, 0},
+            {0, offset*2, 0}, {0, -offset*2, 0},
+            {offset*2, offset*2, 0}, {-offset*2, -offset*2, 0},
+            {offset*2, -offset*2, 0}, {-offset*2, offset*2, 0}
+        };
+        for (auto& o : offsets) {
+            glm::mat4 offsetModel = model;
+            offsetModel = glm::translate(offsetModel, o);
+            shader.setMat4("model", offsetModel);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
 
         
         glfwSwapBuffers(window);

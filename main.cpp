@@ -132,7 +132,7 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         shader.use();
 
-       
+        float t = (float)glfwGetTime();
         glm::mat4 view = glm::mat4(1.0f);
         view  = glm::translate(view, glm::vec3(0.0f, 0.0f, -2.5f));
 
@@ -155,7 +155,16 @@ int main() {
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3( 0.0f,  0.0f,  0.0f));
         float angle = 20.0f; 
-        model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+        model = glm::rotate(model, glm::radians(1.0f), glm::vec3(1.0f, 0.3f, 0.5f));
+        
+        
+        float tx = sin(t) * 0.5f;
+        glm::mat4 T = glm::mat4(1.0f);
+        T[3][0] = tx; 
+        T[3][1] = 0.0f;
+        T[3][2] = 0.0f;
+        model = model * T;
+
         shader.setMat4("model", model);
         
         shader.setFloat("alpha", 1.0f);
